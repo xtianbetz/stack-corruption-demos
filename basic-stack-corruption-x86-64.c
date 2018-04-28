@@ -10,6 +10,7 @@ typedef struct _head {
 	u_int64_t field6; // note: field6 starts 40 bytes into the struct
 	u_int64_t field7;
 	u_int64_t field8;
+	u_int64_t field9;
 } head;
 
 // These pointers help us cheat and locate good smashing spots
@@ -28,9 +29,9 @@ void foo2(head *thing2) {
 
 	printf("Address of pointer we want to change: %p\n",
 	       the_pointer_to_smash);
-	printf("Address of badpointer->field5: %p\n", &badpointer->field5);
+	printf("Address of badpointer->field6: %p\n", &badpointer->field6);
 	printf("Difference between addresses: %ld\n",
-	       (unsigned long) the_pointer_to_smash - (unsigned long) &badpointer->field5);
+	       (unsigned long) the_pointer_to_smash - (unsigned long) &badpointer->field6);
 
 	// It looks like we're just writing a struct field...
 	// Oops we just overwrote the x variable on our own stack
@@ -42,15 +43,15 @@ void foo2(head *thing2) {
 	// ... Instead, we overwrite the value of foo1's thing1 pointer
 	//  this is pointing some number of bytes up the stack from
 	//  where x is: the value of foo'
-	badpointer->field5 = 0xdeadbeef;
+	badpointer->field6 = 0xdeadbeef;
 
 	printf("Address of other pointer we want to change: %p\n",
 	       the_other_pointer_to_smash);
-	printf("Address of badpointer->field8: %p\n", &badpointer->field8);
+	printf("Address of badpointer->field9: %p\n", &badpointer->field9);
 	printf("Difference between addresses: %ld\n",
-	       (unsigned long) the_other_pointer_to_smash - (unsigned long) &badpointer->field8);
+	       (unsigned long) the_other_pointer_to_smash - (unsigned long) &badpointer->field9);
 
-	badpointer->field8 = 37;
+	badpointer->field9 = 37;
 
 	printf("foo2 (after smash):  thing2 is a pointer "
 	       "at address %p pointing to %p [local variable x = %lu]\n",
