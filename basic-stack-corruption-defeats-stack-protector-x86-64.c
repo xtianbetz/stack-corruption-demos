@@ -1,7 +1,3 @@
-/*
- * gcc -fno-stack-protector -z execstack -no-pie undetectable_stack_smash.c
- */
-
 #include <stdio.h>
 #include <sys/types.h>
 

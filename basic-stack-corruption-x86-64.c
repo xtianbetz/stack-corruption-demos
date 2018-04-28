@@ -1,7 +1,3 @@
-/*
- * gcc -fno-stack-protector -z execstack -no-pie undetectable_stack_smash.c
- */
-
 #include <stdio.h>
 #include <sys/types.h>
 
@@ -16,7 +12,9 @@ typedef struct _head {
 	u_int64_t field8;
 } head;
 
-// These pointers help us cheat and find good smashing spots
+// These pointers help us cheat and locate good smashing spots
+// We never manipulate them directly, but they are useful to see which direction
+// we need to go and how many bytes to travel in order to smash our target.
 void *the_pointer_to_smash;
 void *the_other_pointer_to_smash;
 
