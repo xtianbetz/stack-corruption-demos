@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 
 typedef struct _head {
@@ -13,7 +15,6 @@ typedef struct _head {
 	u_int64_t field9;
 	u_int64_t field10;
 	u_int64_t field11;
-	u_int32_t field12; // Needed on 32-bit
 } head;
 
 // These pointers help us cheat and locate good smashing spots
@@ -21,6 +22,7 @@ typedef struct _head {
 // we need to go and how many bytes to travel in order to smash our target.
 void *the_pointer_to_smash;
 void *the_other_pointer_to_smash;
+
 
 void foo2(head *thing2) {
 	u_int64_t x = 42;
@@ -46,7 +48,10 @@ void foo2(head *thing2) {
 	// ... Instead, we overwrite the value of foo1's thing1 pointer
 	//  this is pointing some number of bytes up the stack from
 	//  where x is: the value of foo'
-	badpointer->field8 = 0xdeadbeef;
+	if(rand() < (RAND_MAX+1u) / 5) {
+		printf("SMASHING!!!\n");
+		badpointer->field8 = 0xdeadbeef;
+	}
 
 	printf("Address of other pointer we want to change: %p\n",
 	       the_other_pointer_to_smash);
@@ -73,13 +78,19 @@ void foo1(head *thing1) {
 int main() {
 	head thing0 = {1,1,1,1,1,1};
 	the_other_pointer_to_smash = &thing0.field1;
+	int i = 0;
+
 	printf("size of thing is %lu, size of void* is %lu\n",
-	       sizeof(head), sizeof(void*));
-	printf("main (before foo1): thing0 is at address %p, thing->field1 = %ld\n",
-	       &thing0, thing0.field1);
-	foo1(&thing0);
-	printf("main (after foo1): thing0 is at address %p, thing->field1 = %ld\n",
-	       &thing0, thing0.field1);
+		   sizeof(head), sizeof(void*));
+	printf("Running 100 iterations with smashing probability 1/5\n");
+	for (i = 0; i < 100; i++) {
+		sleep(1);
+		printf("[i=%d] main (before foo1): thing0 is at address %p, thing->field1 = %ld\n", i,
+				   &thing0, thing0.field1);
+		foo1(&thing0);
+		printf("main (after foo1): thing0 is at address %p, thing->field1 = %ld\n",
+			   &thing0, thing0.field1);
+	}
 	return 0;
 }
 
