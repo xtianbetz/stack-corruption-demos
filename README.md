@@ -61,6 +61,15 @@ foo2 (thing2=0x7fffffffc170) at basic-stack-corruption-x86-64.c:48
 $3 = -559038737
 ```
 
+## GDB Scripting Example
+
+An example watch.gdb script is included. The scripts dynamically adds and
+removes a watchpoint using two breakpoints.
+
+```
+gdb -x watch.gdb ./basic-stack-corruption-x86
+```
+
 ## TODO
 
 * Demo that works on x86 32-bit
